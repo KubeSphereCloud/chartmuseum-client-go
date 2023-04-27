@@ -1,0 +1,477 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "ChartMuseum API",
+        "title": "Swagger API For ChartMuseum",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/api/charts": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "list all charts",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/chartmuseum_server_multitenant.GetAllChartsOutput"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "upload a chart package or prov file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "chart package file",
+                        "name": "chart",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "prov file",
+                        "name": "prov",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "force upload",
+                        "name": "force",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/charts/{name}": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "list chart versions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "chart name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/repo.ChartVersion"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/charts/{name}/{version}": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get chart info by version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "chart name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chart version",
+                        "name": "version",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/repo.ChartVersion"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "delete chart version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "chart name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chart version",
+                        "name": "version",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/charts/{filename}": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/x-tar",
+                    "application/pgp-signature",
+                    "application/octet-stream"
+                ],
+                "summary": "download chart package(.tgz) or prov file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "\u003cchart-name\u003e-\u003cversion\u003e.tgz or \u003cchart-name\u003e-\u003cversion\u003e.tgz.prov",
+                        "name": "filename",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "chart.Dependency": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "description": "Alias usable alias to be used for the chart",
+                    "type": "string"
+                },
+                "condition": {
+                    "description": "A yaml path that resolves to a boolean, used for enabling/disabling charts (e.g. subchart1.enabled )",
+                    "type": "string"
+                },
+                "enabled": {
+                    "description": "Enabled bool determines if chart should be loaded",
+                    "type": "boolean"
+                },
+                "import-values": {
+                    "description": "ImportValues holds the mapping of source values to parent key to be imported. Each item can be a\nstring or pair of child/parent sublist items.",
+                    "type": "array",
+                    "items": {}
+                },
+                "name": {
+                    "description": "Name is the name of the dependency.\n\nThis must mach the name in the dependency's Chart.yaml.",
+                    "type": "string"
+                },
+                "repository": {
+                    "description": "The URL to the repository.\n\nAppending `index.yaml` to this string should result in a URL that can be\nused to fetch the repository index.",
+                    "type": "string"
+                },
+                "tags": {
+                    "description": "Tags can be used to group charts for enabling/disabling together",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "version": {
+                    "description": "Version is the version (range) of this chart.\n\nA lock file will always produce a single version, while a dependency\nmay contain a semantic version range.",
+                    "type": "string"
+                }
+            }
+        },
+        "chart.Maintainer": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "description": "Email is an optional email address to contact the named maintainer",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name is a user name or organization name",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "URL is an optional URL to an address for the named maintainer",
+                    "type": "string"
+                }
+            }
+        },
+        "chartmuseum_server_multitenant.GetAllChartsOutput": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/repo.ChartVersion"
+                }
+            }
+        },
+        "gin.H": {
+            "type": "object",
+            "additionalProperties": {}
+        },
+        "repo.ChartVersion": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "description": "Annotations are additional mappings uninterpreted by Helm,\nmade available for inspection by other applications.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "apiVersion": {
+                    "description": "The API Version of this chart. Required.",
+                    "type": "string"
+                },
+                "appVersion": {
+                    "description": "The version of the application enclosed inside of this chart.",
+                    "type": "string"
+                },
+                "checksum": {
+                    "description": "ChecksumDeprecated is deprecated in Helm 3, and therefore ignored. Helm 3 replaced\nthis with Digest. However, with a strict YAML parser enabled, a field must be\npresent on the struct for backwards compatibility.",
+                    "type": "string"
+                },
+                "condition": {
+                    "description": "The condition to check to enable chart",
+                    "type": "string"
+                },
+                "created": {
+                    "type": "string"
+                },
+                "dependencies": {
+                    "description": "Dependencies are a list of dependencies for a chart.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chart.Dependency"
+                    }
+                },
+                "deprecated": {
+                    "description": "Whether or not this chart is deprecated",
+                    "type": "boolean"
+                },
+                "description": {
+                    "description": "A one-sentence description of the chart",
+                    "type": "string"
+                },
+                "digest": {
+                    "type": "string"
+                },
+                "engine": {
+                    "description": "EngineDeprecated is deprecated in Helm 3, and therefore ignored. However, with a strict\nYAML parser enabled, this field must be present.",
+                    "type": "string"
+                },
+                "home": {
+                    "description": "The URL to a relevant project page, git repo, or contact person",
+                    "type": "string"
+                },
+                "icon": {
+                    "description": "The URL to an icon file.",
+                    "type": "string"
+                },
+                "keywords": {
+                    "description": "A list of string keywords",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "kubeVersion": {
+                    "description": "KubeVersion is a SemVer constraint specifying the version of Kubernetes required.",
+                    "type": "string"
+                },
+                "maintainers": {
+                    "description": "A list of name and URL/email address combinations for the maintainer(s)",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chart.Maintainer"
+                    }
+                },
+                "name": {
+                    "description": "The name of the chart. Required.",
+                    "type": "string"
+                },
+                "removed": {
+                    "type": "boolean"
+                },
+                "sources": {
+                    "description": "Source is the URL to the source code of this chart",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tags": {
+                    "description": "The tags to check to enable chart",
+                    "type": "string"
+                },
+                "tillerVersion": {
+                    "description": "TillerVersionDeprecated is deprecated in Helm 3, and therefore ignored. However, with a strict\nYAML parser enabled, this field must be present.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Specifies the chart type: application or library",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "URLDeprecated is deprecated in Helm 3, superseded by URLs. It is ignored. However,\nwith a strict YAML parser enabled, this must be present on the struct.",
+                    "type": "string"
+                },
+                "urls": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "version": {
+                    "description": "A SemVer 2 conformant version string of the chart. Required.",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
+    },
+    "externalDocs": {
+        "description": "OpenAPI",
+        "url": "https://swagger.io/resources/open-api/"
+    }
+}
